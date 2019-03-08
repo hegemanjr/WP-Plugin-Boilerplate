@@ -17,7 +17,7 @@
  */
 
 class WP_Plugin_Boilerplate {
-    public $required_plugin = 'hello.php';// Path to required plugin path relative to the plugins dir. Leave blank for no required plugin
+//    public $required_plugin = 'hello.php';// See documentation for is_plugin_active()
 
     function __construct() {
         add_action('init', array($this, 'action_init'));
