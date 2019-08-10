@@ -26,8 +26,8 @@ class WP_Plugin_Boilerplate {
     public function action_init() {
         add_action('admin_notices', array($this, 'action_admin_notices'));
         add_shortcode( "wp_plugin_boilerplate", array($this, 'add_shortcode'));
-        register_activation_hook( __FILE__, array($this, 'activate_plugin_name'));
-        register_deactivation_hook( __FILE__, array($this, 'deactivate_plugin_name'));
+        register_activation_hook( __FILE__, array($this, 'activate_plugin'));
+        register_deactivation_hook( __FILE__, array($this, 'deactivate_plugin'));
     }
 
     function action_admin_notices() {
