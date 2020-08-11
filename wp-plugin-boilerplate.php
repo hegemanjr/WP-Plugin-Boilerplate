@@ -17,32 +17,32 @@
  */
 
 class WP_Plugin_Boilerplate {
-//    public $required_plugin = 'hello.php';// See documentation for is_plugin_active()
+	//public $required_plugins = array('hello.php');// See documentation for is_plugin_active()
+	protected $required_plugins_active = false;
 
     function __construct() {
         add_action('init', array($this, 'action_init'));
     }
 
     public function action_init() {
-        add_action('admin_notices', array($this, 'action_admin_notices'));
-        add_shortcode( "wp_plugin_boilerplate", array($this, 'add_shortcode'));
-        register_activation_hook( __FILE__, array($this, 'activate_plugin'));
-        register_deactivation_hook( __FILE__, array($this, 'deactivate_plugin'));
+		$this->required_plugins_active();
+		add_action('admin_notices', array($this, 'action_admin_notices'));
+		register_activation_hook( __FILE__, array($this, 'activation_hook'));
+		register_deactivation_hook( __FILE__, array($this, 'deactivation_hook'));
+		add_shortcode( "wp_plugin_boilerplate", array($this, 'add_shortcode'));
     }
 
     function action_admin_notices() {
-        // check if $required_plugin is installed and active
-        if (isset($this->required_plugin) && $this->required_plugin != '' && !$this->required_plugin_is_active()) {
-            ?>
-            <div class="notice notice-error">
+		// check if required plugins are installed and active
+		if (!$this->required_plugins_active) {
+		?>
+		<div class="notice notice-error">
                 <p><strong>WP Plugin Boilerplate</strong>: 'Hello Dolly' plugin is required. Please ensure it is installed and active.</p>
-            </div>
-            <?php
-        }
-    }
-
-    private function required_plugin_is_active(){
-            return is_plugin_active( $this->required_plugin );
+		</div>
+		<?php
+		// Deactivate plugin because it is missing required plugin(s)
+		$this->deactivate_plugin();
+		}
     }
 
     function add_shortcode( $atts ) {
@@ -54,13 +54,28 @@ class WP_Plugin_Boilerplate {
         return "foo = {$a['foo']}";
     }
 
-    function activate_plugin() {
-        // Do stuff
-    }
+	private function required_plugins_active(){
+		foreach ($this->required_plugins as $required_plugin){
+			if($required_plugin != '' && !is_plugin_active($required_plugin)){
+				$this->required_plugins_active = false;
+				return false;
+			}
+		}
+		$this->required_plugins_active = true;
+		return true;
+	}
 
-    function deactivate_plugin() {
-        // Do stuff
-    }
+	function activation_hook() {
+		// Do stuff
+	}
+
+	function deactivation_hook() {
+		// Do stuff
+	}
+
+	private function deactivate_plugin() {
+		deactivate_plugins( plugin_basename( __FILE__ ) );
+	}
 }
 new WP_Plugin_Boilerplate();
 
