@@ -30,6 +30,10 @@ class WP_Plugin_Boilerplate {
 		register_activation_hook( __FILE__, array($this, 'activation_hook'));
 		register_deactivation_hook( __FILE__, array($this, 'deactivation_hook'));
 		add_shortcode( "wp_plugin_boilerplate", array($this, 'add_shortcode'));
+	    	if($this->required_plugins_active === true){
+			// Do things that depend on required plugins
+			
+		}
     }
 
     function action_admin_notices() {
