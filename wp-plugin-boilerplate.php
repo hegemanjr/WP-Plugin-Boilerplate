@@ -17,60 +17,106 @@
  */
 
 class WP_Plugin_Boilerplate {
-	//public $required_plugins = array('hello.php');// See documentation for is_plugin_active()
-	protected $required_plugins_active = false;
+	private $plugin_name = 'WP Plugin Boilerplate';
+	public $required_plugins = array();// No required plugins
+//	public $required_plugins = array('hello.php');// List of required plugins. See documentation for is_plugin_active()
+	private $admin_notices = array( /* array('class'=>'notice notice-error', 'message'=>'An error has occurred.') */);
+	public $text_domain = 'wp_plugin_boilerplate';
+	protected $required_plugins_active = null;
+	private $auto_deactivate_sans_requirements = true;
 
-    function __construct() {
-        add_action('init', array($this, 'action_init'));
-    }
-
-    public function action_init() {
+	function __construct() {
+		add_action('init', array($this, 'action_init'));
 		$this->required_plugins_active();
 		add_action('admin_notices', array($this, 'action_admin_notices'));
-		register_activation_hook( __FILE__, array($this, 'activation_hook'));
-		register_deactivation_hook( __FILE__, array($this, 'deactivation_hook'));
-		add_shortcode( "wp_plugin_boilerplate", array($this, 'add_shortcode'));
-	    	if($this->required_plugins_active === true){
+		register_activation_hook(__FILE__, array($this, 'activation_hook'));
+		register_deactivation_hook(__FILE__, array($this, 'deactivation_hook'));
+		add_shortcode("wp_plugin_boilerplate", array($this, 'add_shortcode'));
+		if ($this->required_plugins_active === true) {
 			// Do things that depend on required plugins
-			
-		}
-    }
 
-    function action_admin_notices() {
-		// check if required plugins are installed and active
-		if (!$this->required_plugins_active) {
+		}
+	}
+
+	public function action_init() {
+	}
+
+	function action_admin_notices() {
+		// Display any admin notices
+		foreach ($this->admin_notices as $admin_notice) {
+			$message = __(
+				'<strong>' . $this->plugin_name . '</strong>: ' . esc_html($admin_notice['message']),
+				$this->text_domain
+			);
+
+			printf('<div class="%1$s"><p>%2$s</p></div>', esc_attr($admin_notice['class']), $message);
+		}
 		?>
-		<div class="notice notice-error">
-                <p><strong>WP Plugin Boilerplate</strong>: 'Hello Dolly' plugin is required. Please ensure it is installed and active.</p>
-		</div>
 		<?php
-		// Deactivate plugin because it is missing required plugin(s)
-		$this->deactivate_plugin();
-		}
-    }
+	}
 
-    function add_shortcode( $atts ) {
-        $a = shortcode_atts( array(
-            'foo' => 'something',
-            'bar' => 'something else',
-        ), $atts );
+	function add_shortcode($atts) {
+		$a = shortcode_atts(array(
+			'foo' => 'something',
+			'bar' => 'something else',
+		), $atts);
 
-        return "foo = {$a['foo']}";
-    }
+		return "foo = {$a['foo']}";
+	}
 
-	private function required_plugins_active(){
-		foreach ($this->required_plugins as $required_plugin){
-			if($required_plugin != '' && !is_plugin_active($required_plugin)){
-				$this->required_plugins_active = false;
-				return false;
+	private function required_plugins_active() {
+		// Check for required plugins if we haven't already
+		if ($this->required_plugins_active === null) {
+			if (!empty($this->required_plugins)) {
+				// Make sure is_plugin_active() function is available
+				if (!function_exists('is_plugin_active')) {
+					include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+				}
+
+				foreach ($this->required_plugins as $required_plugin) {
+					if ($required_plugin != '' && !is_plugin_active($required_plugin)) {
+						$this->admin_notices[] = array(
+							'class' => 'notice notice-error',
+							'message' => 'The plugin ' . $required_plugin . ' is required, but not found.'
+						);
+						$this->required_plugins_active = false;
+					}
+				}
+
+				// If $this->required_plugins_active is still null, set to true
+				if ($this->required_plugins_active === null) {
+					$this->required_plugins_active = true;
+				}
+			} else {
+				$this->required_plugins_active = true;
 			}
 		}
-		$this->required_plugins_active = true;
-		return true;
+
+		// Deactivate plugin if requirements not met and auto deactivate is true
+		if ($this->auto_deactivate_sans_requirements && !$this->required_plugins_active) {
+			// Inform user that the plugin has been deactivated
+			$this->admin_notices[] = array(
+				'class' => 'notice notice-error',
+				'message' => 'Plugin has been disabled due to missing requirements!'
+			);
+			// Deactivate plugin because it is missing required plugin(s)
+			$this->deactivate_plugin();
+		}
+
+		return $this->required_plugins_active;
 	}
 
 	function activation_hook() {
-		// Do stuff
+		// Kill activation if requirements not met and auto deactivate is true
+		if ($this->auto_deactivate_sans_requirements && !$this->required_plugins_active) {
+			$message = '';
+
+			foreach ($this->admin_notices as $admin_notice) {
+				$message .= __(esc_html($admin_notice['message']), $this->text_domain) . '<br>';
+			}
+
+			die('<strong>' . $this->plugin_name . '</strong>: <br>' . $message);
+		}
 	}
 
 	function deactivation_hook() {
@@ -78,9 +124,10 @@ class WP_Plugin_Boilerplate {
 	}
 
 	private function deactivate_plugin() {
-		deactivate_plugins( plugin_basename( __FILE__ ) );
+		deactivate_plugins(plugin_basename(__FILE__));
 	}
 }
+
 new WP_Plugin_Boilerplate();
 
 
