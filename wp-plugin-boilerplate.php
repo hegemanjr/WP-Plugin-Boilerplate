@@ -18,20 +18,19 @@
 
 class WP_Plugin_Boilerplate {
 	private $plugin_name = 'WP Plugin Boilerplate';
-	public $required_plugins = array();// No required plugins
-//	public $required_plugins = array('hello.php');// List of required plugins. See documentation for is_plugin_active()
-	private $admin_notices = array( /* array('class'=>'notice notice-error', 'message'=>'An error has occurred.') */);
-	public $text_domain = 'wp_plugin_boilerplate';
-	protected $required_plugins_active = null;
-	private $auto_deactivate_sans_requirements = true;
+	private $text_domain = 'wp_plugin_boilerplate';// Text domain for translation support
+	private $required_plugins = array(/*'hello.php'*/);// List of required plugins (empty array with implementation example). See documentation for is_plugin_active()
+	private $admin_notices = array( /* array('class'=>'notice notice-error', 'message'=>'An error has occurred.') */);// empty array with implementation example
+	private $required_plugins_active = null;// Will be set by $this->required_plugins_active()
+	private $auto_deactivate_sans_requirements = true; // If true, the plugin will deactivate itself when requirements are not met. If false, admin notices will be displayed, and plugin will remain active.
 
 	function __construct() {
-		add_action('init', array($this, 'action_init'));
-		$this->required_plugins_active();
-		add_action('admin_notices', array($this, 'action_admin_notices'));
-		register_activation_hook(__FILE__, array($this, 'activation_hook'));
-		register_deactivation_hook(__FILE__, array($this, 'deactivation_hook'));
-		add_shortcode("wp_plugin_boilerplate", array($this, 'add_shortcode'));
+		add_action('init', array($this, 'action_init'));// Run code, and/or call other functions when init action is fired
+		$this->required_plugins_active();// Call function to check requirements
+		add_action('admin_notices', array($this, 'action_admin_notices'));// Run code, and/or call other functions when admin_notices action is fired
+		register_activation_hook(__FILE__, array($this, 'activation_hook'));// Run code, and/or call other functions when register_activation_hook is fired
+		register_deactivation_hook(__FILE__, array($this, 'deactivation_hook'));// Run code, and/or call other functions when register_deactivation_hook is fired
+		add_shortcode("wp_plugin_boilerplate", array($this, 'add_shortcode'));// Add shortcode
 		if ($this->required_plugins_active === true) {
 			// Do things that depend on required plugins
 
@@ -51,8 +50,6 @@ class WP_Plugin_Boilerplate {
 
 			printf('<div class="%1$s"><p>%2$s</p></div>', esc_attr($admin_notice['class']), $message);
 		}
-		?>
-		<?php
 	}
 
 	function add_shortcode($atts) {
