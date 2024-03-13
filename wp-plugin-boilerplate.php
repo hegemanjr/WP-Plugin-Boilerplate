@@ -118,7 +118,7 @@ class WP_Plugin_Boilerplate {
 				}
 
 				foreach ($this->required_plugins as $required_plugin) {
-					if ($required_plugin != '' && !is_plugin_active($required_plugin)) {
+					if ( $required_plugin != '' && !is_plugin_active( $required_plugin ) && !is_readable( WPMU_PLUGIN_DIR . "/$required_plugin" ) ) {
 						$this->admin_notices[] = array(
 							'class' => 'notice notice-error',
 							'message' => 'The plugin ' . $required_plugin . ' is required, but not found.'
