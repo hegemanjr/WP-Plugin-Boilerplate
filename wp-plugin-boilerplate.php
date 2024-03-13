@@ -57,9 +57,11 @@ class WP_Plugin_Boilerplate {
 		add_action('init', array($this, 'action_init'));// Run code, and/or call other functions when init action is fired
 		$this->required_plugins_active();// Call function to check requirements
 		add_action('admin_notices', array($this, 'action_admin_notices'));// Run code, and/or call other functions when admin_notices action is fired
+		add_action( 'network_admin_notices', array( $this, 'action_admin_notices' ) );// Run code, and/or call other functions when network_admin_notices action is fired
 		register_activation_hook(__FILE__, array($this, 'activation_hook'));// Run code, and/or call other functions when register_activation_hook is fired
 		register_deactivation_hook(__FILE__, array($this, 'deactivation_hook'));// Run code, and/or call other functions when register_deactivation_hook is fired
 		add_shortcode("wp_plugin_boilerplate", array($this, 'add_shortcode'));// Add shortcode
+
 		if ($this->required_plugins_active === true) {
 			// Do things that depend on required plugins
 
