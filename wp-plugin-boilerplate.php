@@ -63,37 +63,37 @@ class WP_Plugin_Boilerplate {
 		add_action(
 			'init',
 			array( $this, 'action_init' )
-		);// Run code, and/or call other functions when init action is fired
-		$this->required_plugins_active();// Call function to check requirements
+		);// Run code, and/or call other functions when init action is fired.
+		$this->required_plugins_active();// Call function to check requirements.
 		add_action(
 			'admin_notices',
 			array(
 				$this,
 				'action_admin_notices',
 			)
-		);// Run code, and/or call other functions when admin_notices action is fired
+		);// Run code, and/or call other functions when admin_notices action is fired.
 		add_action(
 			'network_admin_notices',
 			array(
 				$this,
 				'action_admin_notices',
 			)
-		);// Run code, and/or call other functions when network_admin_notices action is fired
+		);// Run code, and/or call other functions when network_admin_notices action is fired.
 		register_activation_hook(
 			__FILE__,
 			array(
 				$this,
 				'activation_hook',
 			)
-		);// Run code, and/or call other functions when register_activation_hook is fired
+		);// Run code, and/or call other functions when register_activation_hook is fired.
 		register_deactivation_hook(
 			__FILE__,
 			array(
 				$this,
 				'deactivation_hook',
 			)
-		);// Run code, and/or call other functions when register_deactivation_hook is fired
-		add_shortcode( 'wp_plugin_boilerplate', array( $this, 'add_shortcode' ) );// Add shortcode
+		);// Run code, and/or call other functions when register_deactivation_hook is fired.
+		add_shortcode( 'wp_plugin_boilerplate', array( $this, 'add_shortcode' ) );// Add shortcode.
 
 		if ( $this->required_plugins_active === true ) {
 			// Do things that depend on required plugins
@@ -105,10 +105,10 @@ class WP_Plugin_Boilerplate {
 	 * @return bool|null
 	 */
 	private function required_plugins_active() {
-		// Check for required plugins if we haven't already
+		// Check for required plugins if we haven't already.
 		if ( $this->required_plugins_active === null ) {
 			if ( ! empty( $this->required_plugins ) ) {
-				// Make sure is_plugin_active() function is available
+				// Make sure is_plugin_active() function is available.
 				if ( ! function_exists( 'is_plugin_active' ) ) {
 					include_once ABSPATH . 'wp-admin/includes/plugin.php';
 				}
@@ -123,7 +123,7 @@ class WP_Plugin_Boilerplate {
 					}
 				}
 
-				// If $this->required_plugins_active is still null, set to true
+				// If $this->required_plugins_active is still null, set to true.
 				if ( $this->required_plugins_active === null ) {
 					$this->required_plugins_active = true;
 				}
@@ -132,14 +132,14 @@ class WP_Plugin_Boilerplate {
 			}
 		}
 
-		// Deactivate plugin if requirements not met and auto deactivate is true
+		// Deactivate plugin if requirements not met and auto deactivate is true.
 		if ( $this->auto_deactivate_sans_requirements && ! $this->required_plugins_active ) {
 			// Inform user that the plugin has been deactivated
 			$this->admin_notices[] = array(
 				'class'   => 'notice notice-error',
 				'message' => 'Plugin has been disabled due to missing requirements!',
 			);
-			// Deactivate plugin because it is missing required plugin(s)
+			// Deactivate plugin because it is missing required plugin(s).
 			$this->deactivate_plugin();
 		}
 
@@ -167,7 +167,7 @@ class WP_Plugin_Boilerplate {
 	 * @return void
 	 */
 	function action_admin_notices() {
-		// Display any admin notices
+		// Display any admin notices.
 		foreach ( $this->admin_notices as $admin_notice ) {
 			$message = __(
 				'<strong>' . $this->plugin_name . '</strong>: ' . esc_html( $admin_notice['message'] ),
@@ -203,7 +203,7 @@ class WP_Plugin_Boilerplate {
 	 * @return void
 	 */
 	function activation_hook() {
-		// Kill activation if requirements not met and auto deactivate is true
+		// Kill activation if requirements not met and auto deactivate is true.
 		if ( $this->auto_deactivate_sans_requirements && ! $this->required_plugins_active ) {
 			$message = '';
 
@@ -220,8 +220,8 @@ class WP_Plugin_Boilerplate {
 	 *
 	 * @return void
 	 */
-	function deactivation_hook() {
-		// Do stuff
+	public function deactivation_hook() {
+		// Do stuff.
 	}
 }
 
