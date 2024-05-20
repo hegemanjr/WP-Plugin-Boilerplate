@@ -19,33 +19,39 @@
 class WP_Plugin_Boilerplate {
 	/**
 	 * Plugin name
+	 *
 	 * @var string
 	 */
 	private $plugin_name = 'WP Plugin Boilerplate';
 	/**
 	 * Text domain for translation support
+	 *
 	 * @var string
 	 */
 	private $text_domain = 'wp_plugin_boilerplate';
 	/**
 	 * List of required plugins. See documentation for is_plugin_active() https://developer.wordpress.org/reference/functions/is_plugin_active/
+	 *
 	 * @var array
 	 * @example array('hello.php') If 'Hello Dolly' were required
 	 */
 	private $required_plugins = array();
 	/**
 	 * An empty array with implementation example. This is used for required plugins by default, but can be used for other admin notices. https://developer.wordpress.org/reference/hooks/admin_notices/
+	 *
 	 * @var array
 	 * @example array( array('class'=>'notice notice-error', 'message'=>'An error has occurred.') ) If you wanted to display to the user that an error has occurred.
 	 */
 	private $admin_notices = array();
 	/**
 	 * Will be set by $this->required_plugins_active()
+	 *
 	 * @var null
 	 */
 	private $required_plugins_active = null;
 	/**
 	 * If true, the plugin will deactivate itself when requirements are not met. If false, admin notices will be displayed, and plugin will remain active.
+	 *
 	 * @var bool
 	 */
 	private $auto_deactivate_sans_requirements = true;
@@ -54,26 +60,40 @@ class WP_Plugin_Boilerplate {
 	 * Constructor. Place actions, filters, and hooks here
 	 */
 	function __construct() {
-		add_action( 'init',
-			array( $this, 'action_init' ) );// Run code, and/or call other functions when init action is fired
+		add_action(
+			'init',
+			array( $this, 'action_init' )
+		);// Run code, and/or call other functions when init action is fired
 		$this->required_plugins_active();// Call function to check requirements
-		add_action( 'admin_notices', array(
-			$this,
-			'action_admin_notices'
-		) );// Run code, and/or call other functions when admin_notices action is fired
-		add_action( 'network_admin_notices', array(
-			$this,
-			'action_admin_notices'
-		) );// Run code, and/or call other functions when network_admin_notices action is fired
-		register_activation_hook( __FILE__, array(
-			$this,
-			'activation_hook'
-		) );// Run code, and/or call other functions when register_activation_hook is fired
-		register_deactivation_hook( __FILE__, array(
-			$this,
-			'deactivation_hook'
-		) );// Run code, and/or call other functions when register_deactivation_hook is fired
-		add_shortcode( "wp_plugin_boilerplate", array( $this, 'add_shortcode' ) );// Add shortcode
+		add_action(
+			'admin_notices',
+			array(
+				$this,
+				'action_admin_notices',
+			)
+		);// Run code, and/or call other functions when admin_notices action is fired
+		add_action(
+			'network_admin_notices',
+			array(
+				$this,
+				'action_admin_notices',
+			)
+		);// Run code, and/or call other functions when network_admin_notices action is fired
+		register_activation_hook(
+			__FILE__,
+			array(
+				$this,
+				'activation_hook',
+			)
+		);// Run code, and/or call other functions when register_activation_hook is fired
+		register_deactivation_hook(
+			__FILE__,
+			array(
+				$this,
+				'deactivation_hook',
+			)
+		);// Run code, and/or call other functions when register_deactivation_hook is fired
+		add_shortcode( 'wp_plugin_boilerplate', array( $this, 'add_shortcode' ) );// Add shortcode
 
 		if ( $this->required_plugins_active === true ) {
 			// Do things that depend on required plugins
@@ -90,14 +110,14 @@ class WP_Plugin_Boilerplate {
 			if ( ! empty( $this->required_plugins ) ) {
 				// Make sure is_plugin_active() function is available
 				if ( ! function_exists( 'is_plugin_active' ) ) {
-					include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+					include_once ABSPATH . 'wp-admin/includes/plugin.php';
 				}
 
 				foreach ( $this->required_plugins as $required_plugin ) {
-					if ( $required_plugin != '' && ! is_plugin_active( $required_plugin ) && ! is_readable( WPMU_PLUGIN_DIR . "/$required_plugin" ) ) {
+					if ( $required_plugin !== '' && ! is_plugin_active( $required_plugin ) && ! is_readable( WPMU_PLUGIN_DIR . "/$required_plugin" ) ) {
 						$this->admin_notices[]         = array(
 							'class'   => 'notice notice-error',
-							'message' => 'The plugin ' . $required_plugin . ' is required, but not found.'
+							'message' => 'The plugin ' . $required_plugin . ' is required, but not found.',
 						);
 						$this->required_plugins_active = false;
 					}
@@ -117,7 +137,7 @@ class WP_Plugin_Boilerplate {
 			// Inform user that the plugin has been deactivated
 			$this->admin_notices[] = array(
 				'class'   => 'notice notice-error',
-				'message' => 'Plugin has been disabled due to missing requirements!'
+				'message' => 'Plugin has been disabled due to missing requirements!',
 			);
 			// Deactivate plugin because it is missing required plugin(s)
 			$this->deactivate_plugin();
@@ -135,6 +155,7 @@ class WP_Plugin_Boilerplate {
 
 	/**
 	 * Run code, and/or call other functions when init action is fired
+	 *
 	 * @return void
 	 */
 	public function action_init() {
@@ -142,6 +163,7 @@ class WP_Plugin_Boilerplate {
 
 	/**
 	 * Run code, and/or call other functions when admin_notices action is fired
+	 *
 	 * @return void
 	 */
 	function action_admin_notices() {
@@ -164,16 +186,20 @@ class WP_Plugin_Boilerplate {
 	 * @return string
 	 */
 	function add_shortcode( $atts ) {
-		$a = shortcode_atts( array(
-			'foo' => 'something',
-			'bar' => 'something else',
-		), $atts );
+		$a = shortcode_atts(
+			array(
+				'foo' => 'something',
+				'bar' => 'something else',
+			),
+			$atts
+		);
 
 		return "foo = {$a['foo']}";
 	}
 
 	/**
 	 * Run code, and/or call other functions when register_activation_hook is fired
+	 *
 	 * @return void
 	 */
 	function activation_hook() {
@@ -191,6 +217,7 @@ class WP_Plugin_Boilerplate {
 
 	/**
 	 * Run code, and/or call other functions when register_deactivation_hook is fired
+	 *
 	 * @return void
 	 */
 	function deactivation_hook() {
